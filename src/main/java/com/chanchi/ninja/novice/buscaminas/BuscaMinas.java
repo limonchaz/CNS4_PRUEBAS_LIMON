@@ -51,7 +51,7 @@ public class BuscaMinas {
         return newRow;
     }
     
-    public void countMines(String val) {
+    public void countMines(String val, Integer pos, Integer max) {
         if ("*".equals(val)) {
             //obtener la posicion a la izquierda y la posicion a la derecha y sumarle un 1
         }
