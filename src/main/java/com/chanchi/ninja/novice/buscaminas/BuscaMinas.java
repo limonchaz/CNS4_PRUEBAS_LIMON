@@ -1,59 +1,88 @@
 package com.chanchi.ninja.novice.buscaminas;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+
+import com.chanchi.ninja.novice.buscaminas.utils.Util;
 
 public class BuscaMinas {
 
     public void startGame(String fileName) {
+        String[] content = {};
         try {
-            readFile(fileName);
+            content = Util.readFile(fileName);
+            processContent(content);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+           System.out.println("Exception : " + e);
         }
     }
     
-    public void readFile(String fileName) throws IOException {
-        FileReader fr = new FileReader(fileName);
-        BufferedReader br = new BufferedReader(fr);
+    private void processContent(String[] content) {
+        int colNumber = 0;
+        int rowNumber = 0;
+        String[][] matrix = {};
         
-        String linea =  br.readLine();
-        
-        String[] rows = {};
-        
-        while(linea != null) {
-            int val = 0;
-            int left = 0;
-            int right = 0;
-            boolean flag = false;
-            rows = linea.split("");
-
-            for (int i = 0; i < rows.length; i++) {
-                String[] newRow = buildNumericBoard(rows);
-            }
-            System.out.println("");
-            linea = br.readLine();
+        if (content != null) {
+            String[] dimension = content[0].split("");
+            rowNumber = Integer.parseInt(dimension[0]);
+            colNumber = Integer.parseInt(dimension[2]);
+            matrix = new String[rowNumber][colNumber];
         }
         
-        br.close();
-    }
-    
-    
-    public String[] buildNumericBoard(String[] row) {
-        String[] newRow = {};
-        for (int i = 0; i < row.length; i++) {
-            if (".".equals(row[i])) {
-                row[i] = "0";
+        for (int i = 0; i < content.length; i++) {
+            String row = content[i];
+            
+            if (i > 0) {
+                matrix[i-1] = buildNumericBoard(row);
+                Util.printLine(matrix[i-1]);
             }
         }
-        return newRow;
+        findMinesInCol(content, rowNumber);
     }
     
-    public void countMines(String val, Integer pos, Integer max) {
-        if ("*".equals(val)) {
-            //obtener la posicion a la izquierda y la posicion a la derecha y sumarle un 1
+    private String[] buildNumericBoard(String line) {
+        String[] values = line.split("");
+        
+        for(int i = 0; i < values.length; i++) {
+            if (".".equals(values[i])) {
+                values[i] = "0";
+            }
+        }
+        return findMinesInRow(values);
+    }
+    
+    private String[] findMinesInRow(String[] line) {
+        for(int col = 0; col < line.length; col++) {
+            if ("*".equals(line[col])) {
+                if (col == 0) {
+                    if (!"*".equals(line[col + 1])) {
+                        Integer r = Integer.parseInt(line[col + 1]) + 1;
+                        line[col + 1] = r.toString();
+                    }
+                } else if (col == (line.length - 1)) {
+                    if (!"*".equals(line[col - 1])) {
+                        Integer l = Integer.parseInt(line[col - 1]) + 1;
+                        line[col - 1] = l.toString();
+                    }
+                } else {
+                    if (!"*".equals(line[col + 1])) {
+                        Integer r = Integer.parseInt(line[col + 1]) + 1;
+                        line[col + 1] = r.toString();
+                    }
+                    if (!"*".equals(line[col - 1])) {
+                        Integer l = Integer.parseInt(line[col - 1]) + 1;
+                        line[col - 1] = l.toString();
+                    }
+                }
+            }
+        }
+        return line;
+    }
+    
+    private void findMinesInCol(String[] line, int maxRows) {
+        for(int col = 0; col < line.length; col++) {
+            if ("*".equals(line[col])) {
+                
+            }
         }
     }
 }

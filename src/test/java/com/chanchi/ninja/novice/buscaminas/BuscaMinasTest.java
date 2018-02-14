@@ -10,9 +10,9 @@ public class BuscaMinasTest {
         BuscaMinas bm = new BuscaMinas();
         
         try {
-            bm.readFile(fileName);
+            bm.startGame(fileName);
         }catch (Exception e) {
-            System.out.println("No encontro el archivo");
+            System.out.println("No encontro el archivo " + e);
         }
     }
 }
