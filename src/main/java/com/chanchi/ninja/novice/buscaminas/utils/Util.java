@@ -13,6 +13,7 @@ public class Util {
         BufferedReader br = new BufferedReader(fr);
         String linea = br.readLine();
         List<String> content = new ArrayList<String>();
+        String[] arr = null;
 
         while(linea != null) {
             content.add(linea);
@@ -20,13 +21,14 @@ public class Util {
         }
         br.close();
         
-        String[] arr = new String[content.size()];
-        arr = content.toArray(arr);
-        
+        if (content.size() > 0) {
+            arr = new String[content.size()];
+            arr = content.toArray(arr);
+        }
         return arr;
     }
     
-    public static void printLine(String[][] matrix) {
+    public static void printBoard(String[][] matrix) {
         for (String[] row: matrix) {
             for(String val : row) {
                 System.out.print(val);
