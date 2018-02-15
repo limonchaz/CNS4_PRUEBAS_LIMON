@@ -26,10 +26,12 @@ public class Util {
         return arr;
     }
     
-    public static void printLine(String[] row) {
-        for(int i = 0; i < row.length; i++) {
-            System.out.print(row[i]);
+    public static void printLine(String[][] matrix) {
+        for (String[] row: matrix) {
+            for(String val : row) {
+                System.out.print(val);
+            }
+            System.out.println("");
         }
-        System.out.println("");
     }
 }
