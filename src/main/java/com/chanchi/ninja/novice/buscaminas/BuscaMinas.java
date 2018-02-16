@@ -1,25 +1,32 @@
 package com.chanchi.ninja.novice.buscaminas;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.chanchi.ninja.novice.buscaminas.utils.Util;
 
 public class BuscaMinas {
 
     public String[][] startGame(String fileName) {
+        InputStream is = BuscaMinas.class.getClassLoader().getResourceAsStream(fileName);
         String[] content = {};
         String[][] resolve = null;
         try {
-            content = Util.readFile(fileName);
-            if (content != null) {
-                resolve = processContent(content);
+            if (is != null) {
+                content = Util.readFile(is);
+                if (content != null) {
+                    resolve = processContent(content);
+                } else {
+                    resolve = new String[1][1];
+                    resolve[0][0] = "Archivo incorrecto";
+                }
             } else {
                 resolve = new String[1][1];
-                resolve[0][0] = "El contenido del archivo es vacio";
+                resolve[0][0] = "El archivo no se encontro(2)";
             }
         } catch (IOException e) {
             resolve = new String[1][1];
-            resolve[0][0] = "El archivo no se encontro";
+            resolve[0][0] = "El archivo no se encontro(1)";
         }
         return resolve;
     }
