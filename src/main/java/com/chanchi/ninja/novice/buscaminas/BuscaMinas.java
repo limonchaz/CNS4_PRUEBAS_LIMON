@@ -1,59 +1,126 @@
 package com.chanchi.ninja.novice.buscaminas;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+
+import com.chanchi.ninja.novice.buscaminas.utils.Util;
 
 public class BuscaMinas {
 
-    public void startGame(String fileName) {
+    public String[][] startGame(String fileName) {
+        InputStream is = BuscaMinas.class.getClassLoader().getResourceAsStream(fileName);
+        String[] content = {};
+        String[][] resolve = null;
         try {
-            readFile(fileName);
+            if (is != null) {
+                content = Util.readFile(is);
+                if (content != null) {
+                    resolve = processContent(content);
+                } else {
+                    resolve = new String[1][1];
+                    resolve[0][0] = "Archivo incorrecto";
+                }
+            } else {
+                resolve = new String[1][1];
+                resolve[0][0] = "El archivo no se encontro(2)";
+            }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            resolve = new String[1][1];
+            resolve[0][0] = "El archivo no se encontro(1)";
         }
+        return resolve;
     }
     
-    public void readFile(String fileName) throws IOException {
-        FileReader fr = new FileReader(fileName);
-        BufferedReader br = new BufferedReader(fr);
+    private String[][] processContent(String[] content) {
+        int colNumber = 0;
+        int rowNumber = 0;
+        String[][] matrix = {};
         
-        String linea =  br.readLine();
+        String[] dimension = content[0].split("");
+        rowNumber = Integer.parseInt(dimension[0]);
+        colNumber = Integer.parseInt(dimension[2]);
         
-        String[] rows = {};
-        
-        while(linea != null) {
-            int val = 0;
-            int left = 0;
-            int right = 0;
-            boolean flag = false;
-            rows = linea.split("");
-
-            for (int i = 0; i < rows.length; i++) {
-                String[] newRow = buildNumericBoard(rows);
+        if ((content.length - 1) == rowNumber && content[1].split("").length == colNumber) {
+            matrix = new String[rowNumber][colNumber];
+            
+            /* Dado que la primer linea es la de la dimension la descartamos del tablero */
+            for (int i = 1; i < content.length; i++) {
+                String row = content[i];
+                
+                matrix[i-1] = buildNumericBoard(row);
             }
-            System.out.println("");
-            linea = br.readLine();
+            matrix = findMines(matrix, rowNumber, colNumber);
+        } else {
+            matrix = new String[1][1];
+            matrix[0][0] = "El tamaño del tablero no coincide con las dimensiones especificadas en el archivo";
         }
-        
-        br.close();
+        return matrix;
     }
     
-    
-    public String[] buildNumericBoard(String[] row) {
-        String[] newRow = {};
-        for (int i = 0; i < row.length; i++) {
-            if (".".equals(row[i])) {
-                row[i] = "0";
+    private String[] buildNumericBoard(String line) {
+        String[] values = line.split("");
+        
+        for(int i = 0; i < values.length; i++) {
+            if (".".equals(values[i])) {
+                values[i] = "0";
             }
         }
-        return newRow;
+        return values;
     }
     
-    public void countMines(String val) {
-        if ("*".equals(val)) {
-            //obtener la posicion a la izquierda y la posicion a la derecha y sumarle un 1
+    private String[][] findMines(String[][] board, int maxRows, int maxCols){
+        for (int rowNum = 0; rowNum < maxRows; rowNum++) {
+            for (int colNum = 0; colNum < maxCols; colNum++) {
+                if ("0".equals(board[rowNum][colNum])) {
+                    searchRightMine(board, rowNum, colNum, maxCols);
+                    searchLeftMine(board, rowNum, colNum);
+                    searchMinesDown(board, rowNum, colNum, maxRows, maxCols);
+                    searchMinesUp(board, rowNum, colNum, maxCols);
+                }
+            }
+        }
+        return board;
+    }
+    
+    private void searchRightMine(String[][] board, int row, int col, int colMax) {
+        if ((col + 1) < colMax) {
+            addMine(board, row, col, row, col + 1);
+        }
+    }
+    
+    private void searchLeftMine(String[][] board, int row, int col) {
+        if ((col - 1) > -1) {
+            addMine(board, row, col, row, col - 1);
+        }
+    }
+    
+    private void searchMinesDown(String[][] board, int row, int col, int rowMax, int colMax) {
+        if ((row + 1) < rowMax) {
+            addMine(board, row, col, row + 1, col);
+            if ((col + 1) < colMax) {
+                addMine(board, row, col, row + 1, col + 1);
+            }
+            if ((col - 1) > -1) {
+                addMine(board, row, col, row + 1, col - 1);
+            }
+        }
+    }
+    
+    private void searchMinesUp(String[][] board, int row, int col, int colMax) {
+        if ((row - 1) > -1) {
+            addMine(board, row, col, row - 1, col);
+            if ((col + 1) < colMax) {
+                addMine(board, row, col, row - 1, col + 1);
+            }
+            if ((col - 1) > -1) {
+                addMine(board, row, col, row - 1, col - 1);
+            }
+        }
+    }
+    
+    private void addMine(String[][] board, int row, int col, int sideRow, int sideCol) {
+        if ("*".equals(board[sideRow][sideCol])) {
+            board[row][col] = String.valueOf(Integer.parseInt(board[row][col]) + 1);
         }
     }
 }
